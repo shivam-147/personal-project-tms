@@ -49,7 +49,7 @@ const Bar = ({ index, color }: { index: number; color: string }) => {
         };
 
         animate();
-    }, [index, scaleY, opacity]);
+    }, [index]);
 
     const animatedStyle = useAnimatedStyle(() => {
         return {

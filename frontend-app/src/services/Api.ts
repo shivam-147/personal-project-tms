@@ -13,7 +13,7 @@ class Api {
                     'x-access-token': token
                 }
             })
-            if (response.ok)
+            if (response)
                 return await response.json()
 
             return null
@@ -35,7 +35,8 @@ class Api {
                 body: JSON.stringify(data)
             })
 
-            if (response.ok)
+            console.log(response)
+            if (response)
                 return await response.json()
 
             return null
@@ -57,7 +58,7 @@ class Api {
                 body: JSON.stringify(data)
             })
 
-            if (response.ok)
+            if (response)
                 return await response.json()
 
             return null
@@ -78,7 +79,7 @@ class Api {
                 }
             })
 
-            if (response.ok)
+            if (response)
                 return await response.json()
 
             return null
