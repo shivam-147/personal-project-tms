@@ -10,6 +10,7 @@ import { showToast } from "../redux/toastSlice";
 import { setClients } from "../redux/clientSlice";
 import { setLoading } from "../redux/loaderSlice";
 import ClientCard from "../components/clientCard";
+import AddClientModal from "../components/AddClientModal";
 
 function Dashboard() {
   const router = useRouter();
@@ -51,28 +52,27 @@ function Dashboard() {
   }, [])
 
   return (
-    <SafeAreaView className="flex-1 bg-white dark:bg-black">
-      <View className="px-5 flex-1">
-        {/* Client List */}
-        <View className="flex-1 w-full">
-          <FlatList
-            data={clients}
-            renderItem={({ item }) => <ClientCard client={item} />}
-            keyExtractor={(item) => item._id}
-            contentContainerStyle={{ paddingBottom: 20 }}
-            showsVerticalScrollIndicator={false}
-          />
-        </View>
-
+    <>
+      <View className="flex flex-row justify-end">
         <TouchableOpacity
           onPress={() => setShowModal(true)}
-          className="absolute top-1 right-5 bg-indigo-600 h-14 w-14 rounded-full justify-center items-center shadow-lg active:scale-95"
+          className="m-4 bg-indigo-600 h-14 w-14 rounded-full justify-center items-center shadow-lg active:scale-95"
           style={{ elevation: 5 }}
         >
           <Ionicons name="add" size={30} color="white" />
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+      <View className="flex-1 w-full px-4">
+        <FlatList
+          data={clients}
+          renderItem={({ item }) => <ClientCard client={item} />}
+          keyExtractor={(item) => item._id}
+          contentContainerStyle={{ paddingBottom: 20 }}
+          showsVerticalScrollIndicator={false}
+        />
+        <AddClientModal visible={showModal} onClose={() => setShowModal(false)} />
+      </View>
+    </>
   )
 }
 
