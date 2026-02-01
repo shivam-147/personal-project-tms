@@ -1,8 +1,8 @@
 import { View, Text, TouchableOpacity, FlatList } from "react-native";
+import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from "react-native-safe-area-context";
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
-import { removeData } from "../services/storage";
 import Api from "../services/Api";
 import { endpoints } from "../utils/endpoints";
 import { useSelector, useDispatch } from "react-redux";
@@ -11,17 +11,12 @@ import { setClients } from "../redux/clientSlice";
 import { setLoading } from "../redux/loaderSlice";
 import ClientCard from "../components/clientCard";
 
-
 function Dashboard() {
   const router = useRouter();
   const api = new Api()
   const dispatch = useDispatch()
   const { clients } = useSelector((state: any) => state.client)
-
-  const handleLogout = async () => {
-    await removeData('x-access-token');
-    router.replace('/login');
-  }
+  const [showModal, setShowModal] = useState(false)
 
   useEffect(() => {
     const getClients = async () => {
@@ -57,21 +52,9 @@ function Dashboard() {
 
   return (
     <SafeAreaView className="flex-1 bg-white dark:bg-black">
-      <View className="px-5 py-4 flex-1">
-        <View className="flex-row justify-between items-center">
-          <Text className="text-3xl font-bold text-black dark:text-white">Dashboard</Text>
-          <TouchableOpacity
-            onPress={handleLogout}
-            className="bg-red-500 px-4 py-2 rounded-xl"
-          >
-            <Text className="text-white font-bold">Logout</Text>
-          </TouchableOpacity>
-        </View>
-
-        <Text className="text-base text-gray-500 mt-2">Welcome to your Tiffin Management System</Text>
-
+      <View className="px-5 flex-1">
         {/* Client List */}
-        <View className="mt-5 flex-1 w-full">
+        <View className="flex-1 w-full">
           <FlatList
             data={clients}
             renderItem={({ item }) => <ClientCard client={item} />}
@@ -80,6 +63,14 @@ function Dashboard() {
             showsVerticalScrollIndicator={false}
           />
         </View>
+
+        <TouchableOpacity
+          onPress={() => setShowModal(true)}
+          className="absolute top-1 right-5 bg-indigo-600 h-14 w-14 rounded-full justify-center items-center shadow-lg active:scale-95"
+          style={{ elevation: 5 }}
+        >
+          <Ionicons name="add" size={30} color="white" />
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   )

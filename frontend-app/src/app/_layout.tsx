@@ -18,7 +18,9 @@ export default function RootLayout() {
             headerShown: false,
           }}
         >
-          <Stack.Screen name="dashboard" />
+          <Stack.Screen name="(home)" />
+          <Stack.Screen name="login" />
+          <Stack.Screen name="register" />
         </Stack>
       </SafeAreaProvider>
     </Provider>

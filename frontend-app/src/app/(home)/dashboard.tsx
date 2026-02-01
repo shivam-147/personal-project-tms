@@ -1,5 +1,5 @@
-import Dashboard from "../screens/Dashboard";
-import { restoreData } from "../services/storage";
+import Dashboard from "../../screens/Dashboard";
+import { restoreData } from "../../services/storage";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
 

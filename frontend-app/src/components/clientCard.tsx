@@ -1,24 +1,10 @@
 import { View, Text, TouchableOpacity } from "react-native";
 import { useMemo } from "react";
-
-/*
-    {11 items
-"_id":"697f2326698868c3e4f69498"
-"userId":"697da272830196c474b93f4a"
-"name":"shivam"
-"email":"xya@gmail.com"
-"frequency":"TWICE"
-"advanceAmount":0
-"ratePerTiffine":60
-"dateOfStart":"2026-02-01T09:43:54.615Z"
-"createdAt":"2026-02-01T09:55:50.052Z"
-"updatedAt":"2026-02-01T09:55:50.052Z"
-"__v":0
-}
-
- */
+import { useRouter } from "expo-router";
 
 export default function ClientCard({ client }: { client: any }) {
+
+    const router = useRouter();
 
     const initials = useMemo(() => {
         const name = client.name || "";
@@ -64,7 +50,8 @@ export default function ClientCard({ client }: { client: any }) {
                     {initials}
                 </Text>
             </View>
-            <TouchableOpacity className="flex-1 flex-row justify-between items-center">
+            <TouchableOpacity className="flex-1 flex-row justify-between items-center"
+            >
                 <View className="flex-1 pr-2">
                     <Text className="text-lg font-bold text-gray-900 dark:text-white capitalize" numberOfLines={1}>
                         {client.name}
