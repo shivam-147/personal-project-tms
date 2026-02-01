@@ -1,9 +1,9 @@
-import Storage from "expo-native-storage";
+import * as SecureStore from 'expo-secure-store';
 
 const storeData = async (key: string, data: any) => {
     try {
         const value = JSON.stringify(data)
-        await Storage.setItem(key, value)
+        await SecureStore.setItemAsync(key, value)
     } catch (err: any) {
         console.log('[STORE DATA ERROR] ', err.message)
     }
@@ -11,7 +11,7 @@ const storeData = async (key: string, data: any) => {
 
 const restoreData = async (key: string) => {
     try {
-        const data = await Storage.getItem(key)
+        const data = await SecureStore.getItemAsync(key)
         if (!data) return null
 
         return JSON.parse(data)
@@ -22,7 +22,7 @@ const restoreData = async (key: string) => {
 
 const removeData = async (key: string) => {
     try {
-        await Storage.removeItem(key)
+        await SecureStore.deleteItemAsync(key)
     } catch (err: any) {
         console.log('[REMOVE DATA ERROR] ', err.message)
     }

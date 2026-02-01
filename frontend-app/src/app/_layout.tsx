@@ -1,6 +1,24 @@
 import { Stack } from "expo-router";
 import '../../global.css';
+import { Provider } from "react-redux";
+import { store } from "../redux/store";
+import Loader from "../components/Loader";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+
 
 export default function RootLayout() {
-  return <Stack />;
+  return (
+    <Provider store={store}>
+      <Loader />
+      <SafeAreaProvider>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+          }}
+        >
+          <Stack.Screen name="dashboard" />
+        </Stack>
+      </SafeAreaProvider>
+    </Provider>
+  )
 }
