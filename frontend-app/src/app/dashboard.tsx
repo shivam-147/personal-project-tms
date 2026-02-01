@@ -1,11 +1,9 @@
 import Dashboard from "../screens/Dashboard";
 import { restoreData } from "../services/storage";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
-import { View, ActivityIndicator } from "react-native";
+import { useEffect } from "react";
 
 export default function Index() {
-  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -14,21 +12,11 @@ export default function Index() {
 
       if (!token) {
         router.replace('/login');
-      } else {
-        setIsLoading(false);
       }
     }
 
     checkAuth();
   }, []);
-
-  if (isLoading) {
-    return (
-      <View className="flex-1 justify-center items-center bg-white dark:bg-black">
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    )
-  }
 
   return (
     <Dashboard />

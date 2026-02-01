@@ -7,65 +7,104 @@ import { useDispatch } from 'react-redux';
 import { useRouter } from 'expo-router';
 import { setLoading } from '../redux/loaderSlice';
 import { storeData } from '../services/storage';
+import { showToast } from '../redux/toastSlice';
+import Api from '../services/Api';
+import { endpoints } from '../utils/endpoints';
 
-// Replace with your machine's IP address if testing on a physical device.
-const API_URL = 'http://localhost:3000/api/auth/register';
 
 function Register() {
   const [showPassword, setShowPassword] = useState(false);
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const dispatch = useDispatch();
   const router = useRouter();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  const api = new Api();
+
+
+  const [data, setData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  });
+
+
+  const handleChange = (key: string, value: string) => {
+    setData({ ...data, [key]: value })
+  }
+
+
+
 
   const handleRegister = async () => {
-    if (!name || !email || !password || !confirmPassword) {
-      Alert.alert("Missing Fields", "Please fill in all fields.");
+    if (!data.name || !data.email || !data.password || !data.confirmPassword) {
+      dispatch(showToast({
+        title: "Missing Fields",
+        subtitle: "Please fill all the fields",
+        type: "info"
+      }))
+
       return;
     }
 
-    if (password !== confirmPassword) {
-      Alert.alert("Password Mismatch", "Passwords do not match.");
+    if (!emailRegex.test(data.email)) {
+      dispatch(showToast({
+        title: "Invalid Email",
+        subtitle: "Please enter a valid email",
+        type: "error"
+      }))
+
       return;
     }
 
-    try {
-      dispatch(setLoading(true));
-      console.log('Attempting register to:', API_URL);
+    if (!passwordRegex.test(data.password)) {
+      dispatch(showToast({
+        title: "Invalid Password",
+        subtitle: "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+        type: "error"
+      }))
 
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, email, password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        if (data.payload?.token) {
-          await storeData('x-access-token', data.payload.token);
-          Alert.alert("Success", "Account created successfully!", [
-            { text: "OK", onPress: () => router.replace('/dashboard') }
-          ]);
-        } else {
-          // If purely success message without token (sometimes API differs), handle it.
-          // But controller sends token.
-          Alert.alert("Registration Error", "No token received.");
-        }
-      } else {
-        Alert.alert("Registration Failed", data.message || "Could not create account.");
-      }
-    } catch (error: any) {
-      console.error("Register error:", error);
-      Alert.alert("Network Error", "Could not connect to the server.");
-    } finally {
-      dispatch(setLoading(false));
+      return;
     }
+
+    if (data.password !== data.confirmPassword) {
+      dispatch(showToast({
+        title: "Password Mismatch",
+        subtitle: "Passwords do not match",
+        type: "info"
+      }))
+
+      return;
+    }
+
+    dispatch(setLoading(true));
+    const response = await api.Post(endpoints.register, data)
+
+    if (!response) {
+      dispatch(showToast({
+        title: "Error",
+        subtitle: "Something went wrong, Please try again.",
+        type: "error"
+      }))
+    }
+
+    if (response.success === true) {
+      dispatch(showToast({
+        title: "Success",
+        subtitle: "Account created successfully",
+        type: "success"
+      }))
+      storeData("x-access-token", response.payload.token)
+      router.replace('/dashboard')
+    } else {
+      dispatch(showToast({
+        title: "Error",
+        subtitle: response.message,
+        type: "error"
+      }))
+    }
+    dispatch(setLoading(false));
   };
 
   return (
@@ -107,8 +146,8 @@ function Register() {
                     placeholder="John Doe"
                     placeholderTextColor="#9CA3AF"
                     className="flex-1 ml-3 text-gray-900 dark:text-white text-base"
-                    value={name}
-                    onChangeText={setName}
+                    value={data.name}
+                    onChangeText={(text) => handleChange('name', text)}
                   />
                 </View>
               </Animated.View>
@@ -124,8 +163,8 @@ function Register() {
                     className="flex-1 ml-3 text-gray-900 dark:text-white text-base"
                     autoCapitalize="none"
                     keyboardType="email-address"
-                    value={email}
-                    onChangeText={setEmail}
+                    value={data.email}
+                    onChangeText={(text) => handleChange('email', text)}
                   />
                 </View>
               </Animated.View>
@@ -140,8 +179,8 @@ function Register() {
                     placeholderTextColor="#9CA3AF"
                     className="flex-1 ml-3 text-gray-900 dark:text-white text-base"
                     secureTextEntry={!showPassword}
-                    value={password}
-                    onChangeText={setPassword}
+                    value={data.password}
+                    onChangeText={(text) => handleChange('password', text)}
                   />
                   <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
                     <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={20} color="#6B7280" />
@@ -159,9 +198,13 @@ function Register() {
                     placeholderTextColor="#9CA3AF"
                     className="flex-1 ml-3 text-gray-900 dark:text-white text-base"
                     secureTextEntry={!showPassword}
-                    value={confirmPassword}
-                    onChangeText={setConfirmPassword}
+                    value={data.confirmPassword}
+                    onChangeText={(text) => handleChange('confirmPassword', text)}
+
                   />
+                  <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+                    <Ionicons name={showConfirmPassword ? "eye-off-outline" : "eye-outline"} size={20} color="#6B7280" />
+                  </TouchableOpacity>
                 </View>
               </Animated.View>
 
